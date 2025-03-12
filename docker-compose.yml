@@ -1,0 +1,21 @@
+version: "3.3"
+services:
+  db:
+    container_name: springmy
+    image: mysql/mysql-server:8.0.23
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: always
+    environment:
+      MYSQL_USER: springuser
+      MYSQL_PASSWORD: ThePassword
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_example
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - springmy-data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+volumes:
+  springmy-data:
