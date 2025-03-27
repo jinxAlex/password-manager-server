@@ -2,6 +2,9 @@ package com.example.demo.entities;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,10 +17,14 @@ public class Credential {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length=500)
     private String encryptedData;
+
+    @Column(nullable = false)
+    private String salt;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
@@ -43,6 +50,14 @@ public class Credential {
         this.user = user;
     }
 
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
     public String getEncryptedData() {
         return encryptedData;
     }
@@ -54,7 +69,5 @@ public class Credential {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
-    // No incluimos setter para createdAt para que sea automático
 }
 

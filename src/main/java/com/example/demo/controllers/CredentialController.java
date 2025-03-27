@@ -38,6 +38,7 @@ public class CredentialController {
         Credential newCredential = new Credential();
         newCredential.setUser(user);
         newCredential.setEncryptedData(credentialRequest.getEncryptedData());
+        newCredential.setSalt(credentialRequest.getSalt());
         credentialRepository.save(newCredential);
         
         return "Credential saved";
