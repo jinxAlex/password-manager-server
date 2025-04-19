@@ -1,47 +1,64 @@
 package com.example.demo.controllers;
 
+import java.util.ArrayList;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.entities.User;
 import com.example.demo.repositories.UserRepository;
 
-@Controller
-@RequestMapping(path = "/demo")
-public class UserController {
+@RestController
+@RequestMapping("/user")
+public class UserController implements UserDetailsService {
+
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping(path = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String addNewUser(@RequestBody User user) {
-        String response;
-        if(userRepository.findByEmail(user.getEmail()) != null){
-            response = "User already on database";
-        }else{
-            userRepository.save(user); // Usando el repositorio agrega el usuario que recibe por JSON, este usuario ya tiene la contraseña encriptada junto al email
-            response = "Saved";
+    @PostMapping(path = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> addNewUser(@RequestBody User user) {
+
+        if(userRepository.findByEmail(user.getEmail()).isPresent()){
+            return ResponseEntity.badRequest().body("User already in database");
+        } else {
+            userRepository.save(user);
+            return ResponseEntity.ok("Saved");
         }
-        return response;
     }
 
-    @PostMapping(path = "/checkPassword", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String checkPassword(@RequestBody User user) {
-        // Busca al usuario por email en la base de datos
-        User existingUser = userRepository.findByEmail(user.getEmail());
-        if (existingUser == null) {
-            return "User not found";
+    @PostMapping(path = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> checkPassword(@RequestBody User user) {
+
+        Optional<User> existingUserOpt = userRepository.findByEmail(user.getEmail());
+
+        if (!existingUserOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
-        // Compara la contraseña proporcionada con la almacenada
-        if (existingUser.getPassword().equals(user.getPassword())) {
-            return "User found with matching password";
+
+        User existingUser = existingUserOpt.get();
+
+        if(existingUser.getPassword().equals(user.getPassword())) {
+            return ResponseEntity.ok("User found with matching password");
         } else {
-            return "Incorrect password";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password");
         }
     }
-    
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User usuario = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        return new org.springframework.security.core.userdetails.User(
+                usuario.getEmail(),
+                usuario.getPassword(),
+                new ArrayList<>()
+        );
+    }
 }

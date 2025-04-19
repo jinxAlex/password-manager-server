@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "stored_passwords")
+@Table(name = "stored_credentials")
 public class Credential {
 
     @Id
@@ -33,7 +33,6 @@ public class Credential {
     public Credential() {
     }
 
-    // Getters y Setters
     public Integer getId() {
         return id;
     }

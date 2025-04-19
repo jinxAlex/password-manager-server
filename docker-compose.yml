@@ -7,9 +7,9 @@ services:
     restart: always
     environment:
       MYSQL_USER: springuser
+      MYSQL_DATABASE: blackvault
       MYSQL_PASSWORD: ThePassword
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: db_example
       MYSQL_ROOT_HOST: "%"
     volumes:
       - springmy-data:/var/lib/mysql
