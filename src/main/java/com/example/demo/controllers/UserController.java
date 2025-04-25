@@ -28,7 +28,7 @@ public class UserController implements UserDetailsService {
             return ResponseEntity.badRequest().body("User already in database");
         } else {
             userRepository.save(user);
-            return ResponseEntity.ok("Saved");
+            return ResponseEntity.ok("User created");
         }
     }
 

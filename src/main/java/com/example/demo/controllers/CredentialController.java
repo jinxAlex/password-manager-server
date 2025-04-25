@@ -49,13 +49,25 @@ public class CredentialController {
         return "Credential saved";
     }
 
-    @PostMapping(path = "/getAll", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Iterable<Credential> getAllCredentials(@RequestBody User userRequest) {
-        User user = userRepository.findByEmail(userRequest.getEmail()).get();
-        if (user == null) {
-            return Collections.emptyList();
-        }
+    @PostMapping(path = "/getall")
+    public @ResponseBody Iterable<Credential> getAllCredentials(Principal principal) {
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         
         return credentialRepository.findByUser(user);
+    }
+
+    @PostMapping(path = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String removeCredentials(@RequestBody Credential credentialRequest, Principal principal) {
+        String result;
+        if(credentialRepository.existsById(credentialRequest.getId())){
+            credentialRepository.deleteById(credentialRequest.getId());
+            result = "Credential saved";
+        }else{
+            result = "Credential not found";
+        }
+        
+        return result;
     }
 }
