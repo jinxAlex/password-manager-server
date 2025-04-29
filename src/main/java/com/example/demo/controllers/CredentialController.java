@@ -1,8 +1,7 @@
 package com.example.demo.controllers;
 
 import java.security.Principal;
-import java.util.Collections;
-
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,7 +33,7 @@ public class CredentialController {
     public @ResponseBody String addNewCredential(@RequestBody Credential credentialRequest, Principal principal) {
         User user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        
+
         if (user == null) {
             return "User not found";
         }
@@ -45,7 +44,7 @@ public class CredentialController {
         newCredential.setSalt(credentialRequest.getSalt());
         System.out.println(credentialRequest.getSalt());
         credentialRepository.save(newCredential);
-        
+
         return "Credential saved";
     }
 
@@ -53,21 +52,29 @@ public class CredentialController {
     public @ResponseBody Iterable<Credential> getAllCredentials(Principal principal) {
         String email = principal.getName();
         User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
         return credentialRepository.findByUser(user);
     }
 
     @PostMapping(path = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String removeCredentials(@RequestBody Credential credentialRequest, Principal principal) {
-        String result;
-        if(credentialRepository.existsById(credentialRequest.getId())){
-            credentialRepository.deleteById(credentialRequest.getId());
-            result = "Credential saved";
-        }else{
-            result = "Credential not found";
+        Optional<Credential> credentialOpt = credentialRepository.findById(credentialRequest.getId());
+
+        if (credentialOpt.isEmpty()) {
+            return "Credential not found";
         }
-        
-        return result;
+    
+        Credential credential = credentialOpt.get();
+    
+        String loggedUsername = principal.getName();
+        String email = credential.getUser().getEmail();
+    
+        if (!email.equals(loggedUsername)) {
+            return "Error";
+        }
+    
+        credentialRepository.deleteById(credential.getId());
+        return "Credential deleted";
     }
 }
