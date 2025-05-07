@@ -58,7 +58,7 @@ public class CredentialController {
     }
 
     @PostMapping(path = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String removeCredentials(@RequestBody Credential credentialRequest, Principal principal) {
+    public @ResponseBody String removeCredential(@RequestBody Credential credentialRequest, Principal principal) {
         Optional<Credential> credentialOpt = credentialRepository.findById(credentialRequest.getId());
 
         if (credentialOpt.isEmpty()) {
@@ -77,4 +77,30 @@ public class CredentialController {
         credentialRepository.deleteById(credential.getId());
         return "Credential deleted";
     }
+
+    @PostMapping(path = "/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String editCredential(@RequestBody Credential credentialRequest, Principal principal) {
+        Optional<Credential> credentialOpt = credentialRepository.findById(credentialRequest.getId());
+    
+        if (credentialOpt.isEmpty()) {
+            return "Credential not found";
+        }
+    
+        Credential credential = credentialOpt.get();
+    
+        String loggedUsername = principal.getName();
+        String email = credential.getUser().getEmail();
+    
+        if (!email.equals(loggedUsername)) {
+            return "Unauthorized access";
+        }
+    
+        credential.setEncryptedData(credentialRequest.getEncryptedData());
+        credential.setSalt(credentialRequest.getSalt());
+    
+        credentialRepository.save(credential);
+    
+        return "Credential edited successfully";
+    }
+    
 }
