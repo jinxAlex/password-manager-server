@@ -4,11 +4,11 @@ CREATE TABLE IF NOT EXISTS user (
     password VARCHAR(255) DEFAULT NULL
 );
 
-CREATE TABLE IF NOT EXISTS stored_passwords (
+CREATE TABLE IF NOT EXISTS stored_credentials (
     id INT AUTO_INCREMENT PRIMARY KEY,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     encrypted_data VARCHAR(500) NOT NULL,
     user_id INT NOT NULL,
-    salt VARCHAR(255) NOT NULL,
+    iv VARCHAR(255) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user(id)
 );

@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 
+/**
+ * Entidad que representa una credencial almacenada para un usuario.
+ */
 @Entity
 @Table(name = "stored_credentials")
 public class Credential {
@@ -24,47 +27,86 @@ public class Credential {
     private String encryptedData;
 
     @Column(nullable = false)
-    private String salt;
+    private String iv;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
+    /**
+     * Constructor por defecto.
+     */
     public Credential() {
     }
 
+    /**
+     * Obtiene el identificador de la credencial.
+     * @return el id de la credencial
+     */
     public Integer getId() {
         return id;
     }
 
+    /**
+     * Establece el identificador de la credencial.
+     * @param id el id a establecer
+     */
     public void setId(Integer id) {
         this.id = id;
     }
 
+    /**
+     * Obtiene el usuario asociado a la credencial.
+     * @return el usuario
+     */
     public User getUser() {
         return user;
     }
 
+    /**
+     * Establece el usuario asociado a la credencial.
+     * @param user el usuario a establecer
+     */
     public void setUser(User user) {
         this.user = user;
     }
 
-    public String getSalt() {
-        return salt;
+    /**
+     * Obtiene el vector de inicialización (IV) usado para cifrar los datos.
+     * @return el IV
+     */
+    public String getIv() {
+        return iv;
     }
 
-    public void setSalt(String salt) {
-        this.salt = salt;
+    /**
+     * Establece el vector de inicialización (IV) usado para cifrar los datos.
+     * @param iv el IV a establecer
+     */
+    public void setIv(String iv) {
+        this.iv = iv;
     }
 
+    /**
+     * Obtiene los datos cifrados de la credencial.
+     * @return los datos cifrados
+     */
     public String getEncryptedData() {
         return encryptedData;
     }
 
+    /**
+     * Establece los datos cifrados de la credencial.
+     * @param encryptedData los datos cifrados a establecer
+     */
     public void setEncryptedData(String encryptedData) {
         this.encryptedData = encryptedData;
     }
 
+    /**
+     * Obtiene la fecha y hora de creación de la credencial.
+     * @return la fecha de creación
+     */
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

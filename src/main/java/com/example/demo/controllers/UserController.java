@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import com.example.demo.entities.User;
 import com.example.demo.repositories.UserRepository;
 
+/**
+ * Controlador REST para operaciones relacionadas con usuarios.
+ * Implementa UserDetailsService para la autenticación.
+ */
 @RestController
 @RequestMapping("/user")
 public class UserController implements UserDetailsService {
@@ -21,6 +25,11 @@ public class UserController implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Registra un nuevo usuario si el correo no está en uso.
+     * @param user el usuario a registrar
+     * @return respuesta HTTP indicando el resultado
+     */
     @PostMapping(path = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> addNewUser(@RequestBody User user) {
 
@@ -32,6 +41,11 @@ public class UserController implements UserDetailsService {
         }
     }
 
+    /**
+     * Verifica las credenciales de un usuario para login.
+     * @param user el usuario con email y contraseña a verificar
+     * @return respuesta HTTP indicando si la autenticación fue exitosa
+     */
     @PostMapping(path = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> checkPassword(@RequestBody User user) {
 
@@ -50,6 +64,12 @@ public class UserController implements UserDetailsService {
         }
     }
 
+    /**
+     * Carga los detalles del usuario por su email.
+     * @param email el email del usuario
+     * @return los detalles del usuario para Spring Security
+     * @throws UsernameNotFoundException si el usuario no existe
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User usuario = userRepository.findByEmail(email)

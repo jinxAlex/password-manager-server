@@ -18,6 +18,9 @@ import com.example.demo.repositories.UserRepository;
 
 import jakarta.transaction.Transactional;
 
+/**
+ * Controlador REST para operaciones sobre credenciales almacenadas.
+ */
 @RestController
 @RequestMapping(path = "/credentials")
 public class CredentialController {
@@ -28,6 +31,12 @@ public class CredentialController {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Agrega una nueva credencial para el usuario autenticado.
+     * @param credentialRequest la credencial a agregar
+     * @param principal el usuario autenticado
+     * @return mensaje indicando el resultado
+     */
     @PostMapping(path = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public @ResponseBody String addNewCredential(@RequestBody Credential credentialRequest, Principal principal) {
@@ -41,13 +50,18 @@ public class CredentialController {
         Credential newCredential = new Credential();
         newCredential.setUser(user);
         newCredential.setEncryptedData(credentialRequest.getEncryptedData());
-        newCredential.setSalt(credentialRequest.getSalt());
-        System.out.println(credentialRequest.getSalt());
+        newCredential.setIv(credentialRequest.getIv());
+        System.out.println(credentialRequest.getIv());
         credentialRepository.save(newCredential);
 
         return "Credential saved";
     }
 
+    /**
+     * Obtiene todas las credenciales del usuario autenticado.
+     * @param principal el usuario autenticado
+     * @return lista de credenciales
+     */
     @PostMapping(path = "/getall")
     public @ResponseBody Iterable<Credential> getAllCredentials(Principal principal) {
         String email = principal.getName();
@@ -57,6 +71,12 @@ public class CredentialController {
         return credentialRepository.findByUser(user);
     }
 
+    /**
+     * Elimina una credencial específica del usuario autenticado.
+     * @param credentialRequest la credencial a eliminar
+     * @param principal el usuario autenticado
+     * @return mensaje indicando el resultado
+     */
     @PostMapping(path = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String removeCredential(@RequestBody Credential credentialRequest, Principal principal) {
         Optional<Credential> credentialOpt = credentialRepository.findById(credentialRequest.getId());
@@ -78,6 +98,28 @@ public class CredentialController {
         return "Credential deleted";
     }
 
+
+    /**
+     * Elimina todas las credenciales del usuario autenticado.
+     * @param principal el usuario autenticado
+     * @return mensaje indicando el resultado
+     */
+    @PostMapping(path = "/deleteAll")
+    @Transactional
+    public @ResponseBody String removeAllCredentials(Principal principal) {
+    
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        credentialRepository.deleteByUser(user);
+        return "Passwords eliminated";
+    }
+
+    /**
+     * Edita una credencial existente del usuario autenticado.
+     * @param credentialRequest la credencial con los nuevos datos
+     * @param principal el usuario autenticado
+     * @return mensaje indicando el resultado
+     */
     @PostMapping(path = "/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String editCredential(@RequestBody Credential credentialRequest, Principal principal) {
         Optional<Credential> credentialOpt = credentialRepository.findById(credentialRequest.getId());
@@ -96,7 +138,7 @@ public class CredentialController {
         }
     
         credential.setEncryptedData(credentialRequest.getEncryptedData());
-        credential.setSalt(credentialRequest.getSalt());
+        credential.setIv(credentialRequest.getIv());
     
         credentialRepository.save(credential);
     
