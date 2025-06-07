@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
  * Entidad que representa una credencial almacenada para un usuario.
  */
 @Entity
-@Table(name = "stored_credentials")
 public class Credential {
 
     @Id
