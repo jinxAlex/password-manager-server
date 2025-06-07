@@ -8,8 +8,8 @@ services:
     environment:
       MYSQL_USER: springuser
       MYSQL_DATABASE: blackvault
-      MYSQL_PASSWORD: ThePassword
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: BOMfv2C%8vU7#Nx4ffIS3LTnK
+      MYSQL_ROOT_PASSWORD: BOMfv2C%8vU7#Nx4ffIS3LTnK
       MYSQL_ROOT_HOST: "%"
     volumes:
       - springmy-data:/var/lib/mysql
